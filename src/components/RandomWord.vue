@@ -5,6 +5,8 @@
     <button @click="toggleMeaning">{{ showMeaning? 'Hide Meaning': 'Show Meaning' }}</button>
     <button @click="pickRandomWord">Next Word</button>
     <p v-if="showMeaning">{{ currentMeaning }}</p>
+
+    <p v-if="showMeaning && currentSentence" class="pt-5 text-orange-300">Eg: {{ currentSentence }}</p>
   </div>
 </template>
 <script setup>
@@ -14,6 +16,7 @@ import Papa from "papaparse";
 const words = ref([]);
 const currentWord = ref(null);
 const currentMeaning = ref("");
+const currentSentence = ref("");
 const showMeaning = ref(false);
 const toggleMeaning = () => {
     showMeaning.value = !showMeaning.value
@@ -44,6 +47,7 @@ const pickRandomWord = () => {
   const randomIndex = Math.floor(Math.random() * words.value.length);
   currentWord.value = words.value[randomIndex].word;
   currentMeaning.value = words.value[randomIndex].meaning;
+  currentSentence.value = words.value[randomIndex].sentence
   showMeaning.value = false;
 };
 
