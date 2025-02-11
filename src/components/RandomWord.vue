@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <h2 v-if="currentWord">{{ currentWord }}</h2>
+    <h2 class="text-[24px]" v-if="currentWord">{{ currentWord }}</h2>
     
-    <button @click="showMeaning = true">Show Meaning</button>
+    <button @click="toggleMeaning">{{ showMeaning? 'Hide Meaning': 'Show Meaning' }}</button>
     <button @click="pickRandomWord">Next Word</button>
     <p v-if="showMeaning">{{ currentMeaning }}</p>
   </div>
@@ -15,6 +15,9 @@ const words = ref([]);
 const currentWord = ref(null);
 const currentMeaning = ref("");
 const showMeaning = ref(false);
+const toggleMeaning = () => {
+    showMeaning.value = !showMeaning.value
+}
 
 // Function to fetch and parse CSV
 const loadCSV = async () => {

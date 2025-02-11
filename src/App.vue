@@ -1,11 +1,33 @@
+<template>
+  <component :is="currentComponent.name" />
+  <NavBar :currentTab="currentComponent"  @tab-changed="updateTab" />
+</template>
 <script setup>
 import RandomWord from './components/RandomWord.vue'
+import NavBar from './components/NavBar.vue'
+import CompleteList from './components/CompleteList.vue';
+import { shallowRef } from 'vue';
+
+const componentList = [
+  {
+    id : 1,
+    name: RandomWord
+  },
+  {
+    id: 2,
+    name: CompleteList
+  }
+]
+
+const currentComponent = shallowRef(componentList[0])
+
+const updateTab = (tabId) => {
+  const newComponent = componentList.find((comp) => comp.id === tabId);
+  if (newComponent) {
+    currentComponent.value = newComponent;
+  }
+};
 </script>
-
-<template>
-  <RandomWord />
-</template>
-
 <style scoped>
 .logo {
   height: 6em;
