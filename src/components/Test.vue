@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center justify-start px-4">
+  <div class="flex flex-col items-center justify-start px-4 mb-5">
     <h2 class="text-4xl font-bold mb-4">🔥 {{ streak }}</h2>
     <p class="text-3xl font-bold mb-6">{{ currentWord.word }}</p>
 
@@ -41,6 +41,7 @@ const options = ref([]);
 const selectedOption = ref(null);
 const optionLabels = ["A", "B", "C", "D", "E"];
 const streak = ref(0); // Streak counter
+const resetStreak = ref(false);
 
 const shuffleArray = (array) => {
   let shuffled = array.slice();
@@ -52,6 +53,7 @@ const shuffleArray = (array) => {
 };
 
 const pickRandomWord = () => {
+  if (resetStreak.value) streak.value = 0;
   selectedOption.value = null;
 
   // Pick a random word
@@ -75,9 +77,10 @@ const pickRandomWord = () => {
 const checkAnswer = (option) => {
   selectedOption.value = option;
   if (option === currentWord.value.meaning) {
-    streak.value += 1; // Increase streak for correct answer
+    streak.value += 1;
+    resetStreak.value = false;
   } else {
-    streak.value = 0; // Reset streak for wrong answer
+    resetStreak.value = true;
   }
 };
 
