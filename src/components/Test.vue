@@ -53,7 +53,10 @@ const shuffleArray = (array) => {
 };
 
 const pickRandomWord = () => {
-  if (resetStreak.value) streak.value = 0;
+  if (resetStreak.value) {
+    streak.value = 0;
+    resetStreak.value = false;
+  }
   selectedOption.value = null;
 
   // Pick a random word
@@ -76,9 +79,8 @@ const pickRandomWord = () => {
 
 const checkAnswer = (option) => {
   selectedOption.value = option;
-  if (option === currentWord.value.meaning) {
+  if (option === currentWord.value.meaning && resetStreak.value == false) {
     streak.value += 1;
-    resetStreak.value = false;
   } else {
     resetStreak.value = true;
   }
