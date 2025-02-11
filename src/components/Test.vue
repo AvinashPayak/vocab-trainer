@@ -1,13 +1,13 @@
 <template>
   <div class="flex flex-col items-center justify-start px-4">
     <h2 class="text-4xl font-bold mb-4">🔥 {{ streak }}</h2>
-    <h1 class="text-3xl font-bold mb-6">{{ currentWord.word }}</h1>
+    <h1 class="text-2xl font-bold mb-6">{{ currentWord.word }}</h1>
 
     <div
       v-for="(option, index) in options"
       :key="index"
       @click="checkAnswer(option)"
-      class="cursor-pointer bg-[#1a1a1a] px-6 py-3 rounded-lg text-lg mb-2 w-full max-w-md text-center hover:bg-gray-800"
+      class="cursor-pointer bg-[#1a1a1a] px-6 py-3 rounded-lg text-sm mb-2 w-full max-w-md text-start hover:bg-gray-800"
       :class="{
         'bg-green-500 text-white':
           selectedOption === option && option === currentWord.meaning,
