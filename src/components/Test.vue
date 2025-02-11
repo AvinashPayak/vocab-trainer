@@ -1,5 +1,29 @@
 <template>
   <div class="flex flex-col items-center justify-start px-4 mb-5">
+    <div class="flex gap-2 items-center mb-4">
+      <label class="font-bold">Range:</label>
+      <input
+        v-model.number="rangeStart"
+        type="number"
+        min="1"
+        :max="words.length"
+        class="border p-1 w-16 text-center"
+      />
+      <span>-</span>
+      <input
+        v-model.number="rangeEnd"
+        type="number"
+        min="1"
+        :max="words.length"
+        class="border p-1 w-16 text-center"
+      />
+      <button
+        @click="validateRange"
+        class="ml-2 bg-blue-500 text-white px-2 py-1 rounded"
+      >
+        Set
+      </button>
+    </div>
     <h2 class="text-4xl font-bold mb-4">🔥 {{ streak }}</h2>
     <p class="text-3xl font-bold mb-6">{{ currentWord.word }}</p>
 
@@ -42,6 +66,8 @@ const selectedOption = ref(null);
 const optionLabels = ["A", "B", "C", "D", "E"];
 const streak = ref(0); // Streak counter
 const resetStreak = ref(false);
+const rangeStart = ref(1);
+const rangeEnd = ref(50);
 
 const shuffleArray = (array) => {
   let shuffled = array.slice();
@@ -52,6 +78,12 @@ const shuffleArray = (array) => {
   return shuffled;
 };
 
+const validateRange = () => {
+  if (rangeStart.value < 1) rangeStart.value = 1;
+  if (rangeEnd.value > words.value.length) rangeEnd.value = words.value.length;
+  if (rangeStart.value > rangeEnd.value) rangeEnd.value = rangeStart.value;
+};
+
 const pickRandomWord = () => {
   if (resetStreak.value) {
     streak.value = 0;
@@ -59,9 +91,11 @@ const pickRandomWord = () => {
   }
   selectedOption.value = null;
 
+  const validWords = words.value.slice(rangeStart.value - 1, rangeEnd.value);
+  if (validWords.length === 0) return;
   // Pick a random word
-  const randomIndex = Math.floor(Math.random() * words.value.length);
-  currentWord.value = words.value[randomIndex];
+  const randomIndex = Math.floor(Math.random() *validWords.length);
+  currentWord.value = validWords[randomIndex];
 
   // Select incorrect meanings
   let incorrectOptions = words.value
@@ -97,7 +131,7 @@ onMounted(async () => {
       const [word, meaning] = line.split(",");
       return { word: word.trim(), meaning: meaning.trim() };
     });
-
+  validateRange();
   pickRandomWord();
 });
 </script>
