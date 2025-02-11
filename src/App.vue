@@ -6,6 +6,7 @@
 import RandomWord from './components/RandomWord.vue'
 import NavBar from './components/NavBar.vue'
 import CompleteList from './components/CompleteList.vue';
+import Test from './components/Test.vue';
 import { shallowRef } from 'vue';
 
 const componentList = [
@@ -16,6 +17,10 @@ const componentList = [
   {
     id: 2,
     name: CompleteList
+  },
+  {
+    id: 3,
+    name: Test
   }
 ]
 
