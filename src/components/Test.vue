@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-start px-4">
     <h2 class="text-4xl font-bold mb-4">🔥 {{ streak }}</h2>
-    <h1 class="text-2xl font-bold mb-6">{{ currentWord.word }}</h1>
+    <p class="text-3xl font-bold mb-6">{{ currentWord.word }}</p>
 
     <div
       v-for="(option, index) in options"
