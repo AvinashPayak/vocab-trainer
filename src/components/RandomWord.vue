@@ -1,12 +1,16 @@
 <template>
   <div class="container">
     <h2 class="text-[24px]" v-if="currentWord">{{ currentWord }}</h2>
-    
-    <button @click="toggleMeaning">{{ showMeaning? 'Hide Meaning': 'Show Meaning' }}</button>
+
+    <button @click="toggleMeaning">
+      {{ showMeaning ? "Hide Meaning" : "Show Meaning" }}
+    </button>
     <button @click="pickRandomWord">Next Word</button>
     <p v-if="showMeaning">{{ currentMeaning }}</p>
 
-    <p v-if="showMeaning && currentSentence" class="pt-5 text-orange-300">Eg: {{ currentSentence }}</p>
+    <p v-if="showMeaning && currentSentence" class="pt-5 text-orange-300">
+      Eg: {{ currentSentence }}
+    </p>
   </div>
 </template>
 <script setup>
@@ -19,15 +23,15 @@ const currentMeaning = ref("");
 const currentSentence = ref("");
 const showMeaning = ref(false);
 const toggleMeaning = () => {
-    showMeaning.value = !showMeaning.value
-}
+  showMeaning.value = !showMeaning.value;
+};
 
 // Function to fetch and parse CSV
 const loadCSV = async () => {
   try {
     const response = await fetch("/vocab.csv"); // Ensure the CSV file is in `public/`
     const csvText = await response.text();
-    
+
     Papa.parse(csvText, {
       header: true,
       skipEmptyLines: true,
@@ -47,7 +51,7 @@ const pickRandomWord = () => {
   const randomIndex = Math.floor(Math.random() * words.value.length);
   currentWord.value = words.value[randomIndex].word;
   currentMeaning.value = words.value[randomIndex].meaning;
-  currentSentence.value = words.value[randomIndex].sentence
+  currentSentence.value = words.value[randomIndex].sentence;
   showMeaning.value = false;
 };
 
