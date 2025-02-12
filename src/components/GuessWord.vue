@@ -25,7 +25,7 @@
         </button>
       </div>
       <h2 class="text-4xl font-bold mb-4">🔥 {{ streak }}</h2>
-      <p class="text-3xl font-bold mb-6">{{ currentWord.meaning }}</p>
+      <p class="text-lg font-bold mb-6">{{ currentWord.meaning }}</p>
   
       <div
         v-for="(option, index) in options"
