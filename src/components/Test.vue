@@ -24,35 +24,40 @@
         Set
       </button>
     </div>
-    <h2 class="text-4xl font-bold mb-4">🔥 {{ streak }}</h2>
-    <p class="text-3xl font-bold mb-6">{{ currentWord.word }}</p>
+    <p v-if="completedTest" class="text-2xl font-bold">
+      🎉 All words completed!
+    </p>
+    <div v-else>
+      <h2 class="text-4xl font-bold mb-4">🔥 {{ streak }}</h2>
+      <p class="text-3xl font-bold mb-6">{{ currentWord.word }}</p>
 
-    <div
-      v-for="(option, index) in options"
-      :key="index"
-      @click="checkAnswer(option)"
-      class="cursor-pointer bg-[#1a1a1a] px-6 py-3 rounded-lg text-sm mb-2 w-full max-w-md text-start hover:bg-gray-800"
-      :class="{
-        'bg-green-500 text-white':
-          selectedOption === option && option === currentWord.meaning,
-        'bg-red-500 text-white':
-          selectedOption === option && option !== currentWord.meaning,
-      }"
-    >
-      <span class="font-bold">{{ optionLabels[index] }}.</span> {{ option }}
+      <div
+        v-for="(option, index) in options"
+        :key="index"
+        @click="checkAnswer(option)"
+        class="cursor-pointer bg-[#1a1a1a] px-6 py-3 rounded-lg text-sm mb-2 w-full max-w-md text-start hover:bg-gray-800"
+        :class="{
+          'bg-green-500 text-white':
+            selectedOption === option && option === currentWord.meaning,
+          'bg-red-500 text-white':
+            selectedOption === option && option !== currentWord.meaning,
+        }"
+      >
+        <span class="font-bold">{{ optionLabels[index] }}.</span> {{ option }}
+      </div>
+
+      <button
+        :disabled="!selectedOption"
+        @click="pickRandomWord"
+        class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+        :class="{
+          'bg-blue-500 text-white cursor-pointer': selectedOption,
+          'bg-gray-200 text-gray-700 cursor-not-allowed': !selectedOption,
+        }"
+      >
+        Next Word
+      </button>
     </div>
-
-    <button
-      :disabled="!selectedOption"
-      @click="pickRandomWord"
-      class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-      :class="{
-        'bg-blue-500 text-white cursor-pointer': selectedOption,
-        'bg-gray-200 text-gray-700 cursor-not-allowed': !selectedOption,
-      }"
-    >
-      Next Word
-    </button>
   </div>
 </template>
 
@@ -64,10 +69,13 @@ const currentWord = ref({ word: "", meaning: "" });
 const options = ref([]);
 const selectedOption = ref(null);
 const optionLabels = ["A", "B", "C", "D", "E"];
-const streak = ref(0); // Streak counter
+const streak = ref(0);
 const resetStreak = ref(false);
 const rangeStart = ref(1);
 const rangeEnd = ref(50);
+const completedTest = ref(false);
+// ✅ Track attempts per word
+const wordAttempts = ref({});
 
 const shuffleArray = (array) => {
   let shuffled = array.slice();
@@ -82,8 +90,13 @@ const validateRange = () => {
   if (rangeStart.value < 1) rangeStart.value = 1;
   if (rangeEnd.value > words.value.length) rangeEnd.value = words.value.length;
   if (rangeStart.value > rangeEnd.value) rangeEnd.value = rangeStart.value;
+  resetTest();
 };
 
+const resetTest = () => {
+  completedTest.value = false;
+  pickRandomWord();
+};
 const pickRandomWord = () => {
   if (resetStreak.value) {
     streak.value = 0;
@@ -91,20 +104,27 @@ const pickRandomWord = () => {
   }
   selectedOption.value = null;
 
-  const validWords = words.value.slice(rangeStart.value - 1, rangeEnd.value);
-  if (validWords.length === 0) return;
-  // Pick a random word
-  const randomIndex = Math.floor(Math.random() *validWords.length);
+  let validWords = words.value.slice(rangeStart.value - 1, rangeEnd.value);
+
+  // ✅ Filter out words that have been correctly answered 3 times
+  validWords = validWords.filter(
+    (word) => (wordAttempts.value[word.word] || 0) < 3
+  );
+
+  if (validWords.length === 0) {
+    completedTest.value = true;
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * validWords.length);
   currentWord.value = validWords[randomIndex];
 
-  // Select incorrect meanings
   let incorrectOptions = words.value
     .filter((word) => word.meaning !== currentWord.value.meaning)
     .map((word) => word.meaning);
 
-  incorrectOptions = shuffleArray(incorrectOptions).slice(0, 4); // Pick 4 random wrong options
+  incorrectOptions = shuffleArray(incorrectOptions).slice(0, 4);
 
-  // Shuffle the correct and incorrect meanings
   options.value = shuffleArray([
     currentWord.value.meaning,
     ...incorrectOptions,
@@ -113,24 +133,32 @@ const pickRandomWord = () => {
 
 const checkAnswer = (option) => {
   selectedOption.value = option;
-  if (option === currentWord.value.meaning && resetStreak.value == false) {
+  const word = currentWord.value.word;
+
+  if (option === currentWord.value.meaning) {
     streak.value += 1;
+
+    // ✅ Increment correct count, max 3
+    wordAttempts.value[word] = (wordAttempts.value[word] || 0) + 1;
   } else {
     resetStreak.value = true;
+
+    // ✅ Reset count on wrong answer
+    wordAttempts.value[word] = 0;
   }
 };
 
 onMounted(async () => {
-  // Fetch the CSV file from the public directory
   const response = await fetch("/vocab.csv");
   const text = await response.text();
   words.value = text
     .split("\n")
-    .filter((line) => line.trim()) // Remove empty lines
+    .filter((line) => line.trim())
     .map((line) => {
       const [word, meaning] = line.split(",");
       return { word: word.trim(), meaning: meaning.trim() };
     });
+
   validateRange();
   pickRandomWord();
 });
